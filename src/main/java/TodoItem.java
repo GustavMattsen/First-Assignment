@@ -84,8 +84,39 @@ public class TodoItem {
         return LocalDate.now().isAfter(deadLine);
     }
 
-    // Make a text summary like in Person
-    public String getSummary() {
-        return "{id: " + id + ", title: " + title + ", deadline: " + deadLine + ", done: " + done + "}";
+
+    // new toString() - turns the object into a text
+    // leave out the Person "creator" so it doesn't print all their details
+    @Override
+    public String toString() {
+        return "TodoItem{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", deadLine=" + deadLine +
+                ", done=" + done +
+                '}';
+    }
+
+    // this checks if two TodoItem objects are equal
+    // I don't compare the creator here, just the basic fields
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TodoItem)) return false;
+        TodoItem todoItem = (TodoItem) o;
+        return id == todoItem.id &&
+                done == todoItem.done &&
+                java.util.Objects.equals(title, todoItem.title) &&
+                java.util.Objects.equals(description, todoItem.description) &&
+                java.util.Objects.equals(deadLine, todoItem.deadLine);
+    }
+
+
+    // makes a number from the fields (used for hash tables and stuff)
+    // creator not included
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(id, title, description, deadLine, done);
     }
 }

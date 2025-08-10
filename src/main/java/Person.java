@@ -76,6 +76,9 @@ public class Person {
                 '}';
     }
 
+
+    // checks if this Person is "equal" to another one
+    // I don't compare credentials (AppUser) here, just the basic info
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -87,6 +90,8 @@ public class Person {
                 java.util.Objects.equals(email, person.email);
     }
 
+    // makes a number from the fields (used for hash tables and sets)
+    // credentials not included in this number
     @Override
     public int hashCode() {
         return java.util.Objects.hash(id, firstName, lastName, email);
