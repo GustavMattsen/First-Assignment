@@ -4,6 +4,7 @@ public class Person {
     private String firstName;
     private String lastName;
     private String email;
+    private AppUser credentials;
 
     // Constructor
     public Person(int id, String firstName, String lastName, String email) {
@@ -58,8 +59,36 @@ public class Person {
         this.email = email;
     }
 
-    // Summary with all relevant info
-    public String getSummary() {
-        return "{id: " + id + ", name: " + firstName + " " + lastName + ", email: " + email + "}";
+    public AppUser getCredentials() {
+        return credentials;
+    }
+
+    public void setCredentials(AppUser credentials) {
+        this.credentials = credentials;
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "id=" + id +
+                ", name='" + firstName + " " + lastName + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Person)) return false;
+        Person person = (Person) o;
+        return id == person.id &&
+                java.util.Objects.equals(firstName, person.firstName) &&
+                java.util.Objects.equals(lastName, person.lastName) &&
+                java.util.Objects.equals(email, person.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(id, firstName, lastName, email);
     }
 }
