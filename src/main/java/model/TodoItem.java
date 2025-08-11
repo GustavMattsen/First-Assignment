@@ -1,3 +1,5 @@
+package model;
+
 import java.time.LocalDate;
 
 public class TodoItem {
@@ -86,10 +88,10 @@ public class TodoItem {
 
 
     // new toString() - turns the object into a text
-    // leave out the Person "creator" so it doesn't print all their details
+    // leave out the model.Person "creator" so it doesn't print all their details
     @Override
     public String toString() {
-        return "TodoItem{" +
+        return "model.TodoItem{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
@@ -98,7 +100,7 @@ public class TodoItem {
                 '}';
     }
 
-    // this checks if two TodoItem objects are equal
+    // this checks if two model.TodoItem objects are equal
     // I don't compare the creator here, just the basic fields
     @Override
     public boolean equals(Object o) {

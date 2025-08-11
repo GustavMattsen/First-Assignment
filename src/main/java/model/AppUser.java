@@ -1,3 +1,5 @@
+package model;
+
 import java.util.Objects;
 
 public class AppUser {
@@ -61,7 +63,7 @@ public class AppUser {
     @Override
     public String toString() {
         // password not shown for safety
-        return "AppUser{" +
+        return "model.AppUser{" +
                 "username='" + username + '\'' +
                 ", role=" + role +
                 '}';

@@ -1,6 +1,10 @@
+package dao;
+
+import model.TodoItemTask;
+
 import java.util.Collection;
 
-// what we can do with TodoItemTask objects
+// what we can do with model.TodoItemTask objects
 public interface TodoItemTaskDAO {
     void persist(TodoItemTask task); // add new
     TodoItemTask findById(int id); // find by id

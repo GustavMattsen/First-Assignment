@@ -1,7 +1,12 @@
+package dao.impl;
+
+import dao.AppUserDAO;
+import model.AppUser;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
-// stores AppUser objects in an ArrayList (in memory)
+// stores model.AppUser objects in an ArrayList (in memory)
 public class AppUserDAOCollection implements AppUserDAO {
     private Collection<AppUser> appUsers = new ArrayList<>();
 

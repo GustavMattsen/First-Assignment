@@ -1,3 +1,5 @@
+package model;
+
 public class TodoItemTask {
     private int id;
     private boolean assigned; // true, if we have someone to do it
@@ -7,7 +9,7 @@ public class TodoItemTask {
     // Constructor
     public TodoItemTask(int id, TodoItem todoItem, Person assignee) {
         if (todoItem == null) {
-            throw new IllegalArgumentException("TodoItem cannot be null");
+            throw new IllegalArgumentException("model.TodoItem cannot be null");
         }
         this.id = id;
         this.todoItem = todoItem;
@@ -39,7 +41,7 @@ public class TodoItemTask {
 
     public void setTodoItem(TodoItem todoItem) {
         if (todoItem == null) {
-            throw new IllegalArgumentException("TodoItem cannot be null");
+            throw new IllegalArgumentException("model.TodoItem cannot be null");
         }
         this.todoItem = todoItem;
     }
@@ -50,18 +52,18 @@ public class TodoItemTask {
 
 
     // new toString() - gives a quick text of the task
-    // assignee (Person) is left out so it doesn't print their info
+    // assignee (model.Person) is left out so it doesn't print their info
     @Override
     public String toString() {
-        return "TodoItemTask{" +
+        return "model.TodoItemTask{" +
                 "id=" + id +
                 ", assigned=" + assigned +
                 ", todoItem=" + todoItem +
                 '}';
     }
 
-    // checks if two TodoItemTask objects are "equal"
-    // Person (assignee) is not checked, only id, assigned, and todoItem
+    // checks if two model.TodoItemTask objects are "equal"
+    // model.Person (assignee) is not checked, only id, assigned, and todoItem
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

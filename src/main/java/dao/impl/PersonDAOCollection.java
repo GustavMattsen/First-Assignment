@@ -1,7 +1,12 @@
+package dao.impl;
+
+import dao.PersonDAO;
+import model.Person;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
-// stores Person objects in a list
+// stores model.Person objects in a list
 public class PersonDAOCollection implements PersonDAO {
     private Collection<Person> persons = new ArrayList<>();
 

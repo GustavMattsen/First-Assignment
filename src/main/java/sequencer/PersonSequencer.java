@@ -1,6 +1,6 @@
-package Sequencers;
+package sequencer;
 
-// this keeps track of what id number to give the next Person
+// this keeps track of what id number to give the next model.Person
 public class PersonSequencer {
     // starts at 0 by default
     private static int currentId;

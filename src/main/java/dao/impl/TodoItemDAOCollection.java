@@ -1,8 +1,13 @@
+package dao.impl;
+
+import dao.TodoItemDAO;
+import model.TodoItem;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 
-// stores TodoItem objects in memory
+// stores model.TodoItem objects in memory
 public class TodoItemDAOCollection implements TodoItemDAO {
     private Collection<TodoItem> items = new ArrayList<>();
 

@@ -1,6 +1,10 @@
+package dao;
+
+import model.Person;
+
 import java.util.Collection;
 
-// what we can do with Person objects
+// what we can do with model.Person objects
 public interface PersonDAO {
     void persist(Person person); // add a new person
     Person findById(int id); // find person by id

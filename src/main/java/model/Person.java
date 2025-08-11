@@ -1,3 +1,5 @@
+package model;
+
 public class Person {
     // Variables
     private int id;
@@ -69,7 +71,7 @@ public class Person {
 
     @Override
     public String toString() {
-        return "Person{" +
+        return "model.Person{" +
                 "id=" + id +
                 ", name='" + firstName + " " + lastName + '\'' +
                 ", email='" + email + '\'' +
@@ -77,8 +79,8 @@ public class Person {
     }
 
 
-    // checks if this Person is "equal" to another one
-    // I don't compare credentials (AppUser) here, just the basic info
+    // checks if this model.Person is "equal" to another one
+    // I don't compare credentials (model.AppUser) here, just the basic info
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

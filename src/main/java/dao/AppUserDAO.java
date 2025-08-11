@@ -1,6 +1,10 @@
+package dao;
+
+import model.AppUser;
+
 import java.util.Collection;
 
-// tells us what actions we can do with AppUser objects
+// tells us what actions we can do with model.AppUser objects
 public interface AppUserDAO {
     void persist(AppUser appUser); // add a new user
     AppUser findByUsername(String username); // find user by their username

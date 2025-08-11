@@ -1,7 +1,11 @@
+package dao;
+
+import model.TodoItem;
+
 import java.time.LocalDate;
 import java.util.Collection;
 
-// what we can do with TodoItem objects
+// what we can do with model.TodoItem objects
 public interface TodoItemDAO {
     void persist(TodoItem todoItem); // add new
     TodoItem findById(int id); // find by id

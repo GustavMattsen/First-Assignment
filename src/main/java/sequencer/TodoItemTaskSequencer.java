@@ -1,7 +1,7 @@
-package Sequencers;
+package sequencer;
 
-// // this keeps track of what id number to give the next TodoItem
-public class TodoItemSequencer {
+// // this keeps track of what id number to give the next model.TodoItemTask
+public class TodoItemTaskSequencer {
     private static int currentId;
 
     public static int nextId() {
