@@ -2,7 +2,6 @@ package dao.impl;
 
 import dao.TodoItemTaskDAO;
 import model.TodoItemTask;
-import model.Person;
 
 import java.util.ArrayList;
 import java.util.Collection;
