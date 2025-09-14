@@ -1,9 +1,8 @@
 package dao.impl;
 
 import dao.TodoItemDAO;
-import model.Person;
 import model.TodoItem;
-import database.DBUtils;
+import database.DBConnection;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -12,23 +11,21 @@ import java.util.Collection;
 
 public class TodoItemDAOJDBC implements TodoItemDAO {
 
-    private PersonDAOJDBC personDao = new PersonDAOJDBC();
-
     @Override
     public void persist(TodoItem todoItem) {
-        String sql = "INSERT INTO todo_item (title, description, deadline, done, creator_id) VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = DBUtils.getConnection();
+        String sql = "INSERT INTO todo_item (title, description, deadline, done) VALUES (?, ?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, todoItem.getTitle());
             ps.setString(2, todoItem.getDescription());
             if (todoItem.getDeadLine() != null) {
                 ps.setDate(3, Date.valueOf(todoItem.getDeadLine()));
             } else {
-                ps.setDate(3, null);
+                ps.setNull(3, Types.DATE);
             }
             ps.setBoolean(4, todoItem.isDone());
-            ps.setInt(5, todoItem.getCreator() == null ? 0 : todoItem.getCreator().getId());
             ps.executeUpdate();
+
             try (ResultSet keys = ps.getGeneratedKeys()) {
                 if (keys.next()) {
                     todoItem.setId(keys.getInt(1));
@@ -41,26 +38,22 @@ public class TodoItemDAOJDBC implements TodoItemDAO {
 
     @Override
     public TodoItem findById(int id) {
-        String sql = "SELECT id, title, description, deadline, done, creator_id FROM todo_item WHERE id = ?";
-        try (Connection conn = DBUtils.getConnection();
+        String sql = "SELECT todo_id, title, description, deadline, done FROM todo_item WHERE todo_id = ?";
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    Person creator = null;
-                    int creatorId = rs.getInt("creator_id");
-                    if (creatorId > 0) creator = personDao.findById(creatorId);
-
                     Date d = rs.getDate("deadline");
                     LocalDate ld = (d == null ? null : d.toLocalDate());
 
                     return new TodoItem(
-                            rs.getInt("id"),
+                            rs.getInt("todo_id"),
                             rs.getString("title"),
                             rs.getString("description"),
                             ld,
                             rs.getBoolean("done"),
-                            creator
+                            null // skip assignee for now (beginner style)
                     );
                 }
             }
@@ -72,13 +65,23 @@ public class TodoItemDAOJDBC implements TodoItemDAO {
 
     @Override
     public Collection<TodoItem> findAll() {
-        String sql = "SELECT id FROM todo_item";
+        String sql = "SELECT todo_id, title, description, deadline, done FROM todo_item";
         Collection<TodoItem> result = new ArrayList<>();
-        try (Connection conn = DBUtils.getConnection();
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                result.add(findById(rs.getInt("id")));
+                Date d = rs.getDate("deadline");
+                LocalDate ld = (d == null ? null : d.toLocalDate());
+
+                result.add(new TodoItem(
+                        rs.getInt("todo_id"),
+                        rs.getString("title"),
+                        rs.getString("description"),
+                        ld,
+                        rs.getBoolean("done"),
+                        null
+                ));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -88,13 +91,25 @@ public class TodoItemDAOJDBC implements TodoItemDAO {
 
     @Override
     public Collection<TodoItem> findAllByDoneStatus(boolean done) {
-        String sql = "SELECT id FROM todo_item WHERE done = ?";
+        String sql = "SELECT todo_id, title, description, deadline, done FROM todo_item WHERE done = ?";
         Collection<TodoItem> result = new ArrayList<>();
-        try (Connection conn = DBUtils.getConnection();
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setBoolean(1, done);
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) result.add(findById(rs.getInt("id")));
+                while (rs.next()) {
+                    Date d = rs.getDate("deadline");
+                    LocalDate ld = (d == null ? null : d.toLocalDate());
+
+                    result.add(new TodoItem(
+                            rs.getInt("todo_id"),
+                            rs.getString("title"),
+                            rs.getString("description"),
+                            ld,
+                            rs.getBoolean("done"),
+                            null
+                    ));
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -104,13 +119,25 @@ public class TodoItemDAOJDBC implements TodoItemDAO {
 
     @Override
     public Collection<TodoItem> findByTitleContains(String title) {
-        String sql = "SELECT id FROM todo_item WHERE title LIKE ?";
+        String sql = "SELECT todo_id, title, description, deadline, done FROM todo_item WHERE title LIKE ?";
         Collection<TodoItem> result = new ArrayList<>();
-        try (Connection conn = DBUtils.getConnection();
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "%" + title + "%");
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) result.add(findById(rs.getInt("id")));
+                while (rs.next()) {
+                    Date d = rs.getDate("deadline");
+                    LocalDate ld = (d == null ? null : d.toLocalDate());
+
+                    result.add(new TodoItem(
+                            rs.getInt("todo_id"),
+                            rs.getString("title"),
+                            rs.getString("description"),
+                            ld,
+                            rs.getBoolean("done"),
+                            null
+                    ));
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -120,13 +147,31 @@ public class TodoItemDAOJDBC implements TodoItemDAO {
 
     @Override
     public Collection<TodoItem> findByPersonId(int personId) {
-        String sql = "SELECT id FROM todo_item WHERE creator_id = ?";
+        // Beginner version: ignore the assignee_id foreign key
+        return new ArrayList<>();
+    }
+
+    @Override
+    public Collection<TodoItem> findByDeadlineBefore(LocalDate date) {
+        String sql = "SELECT todo_id, title, description, deadline, done FROM todo_item WHERE deadline < ?";
         Collection<TodoItem> result = new ArrayList<>();
-        try (Connection conn = DBUtils.getConnection();
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, personId);
+            ps.setDate(1, Date.valueOf(date));
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) result.add(findById(rs.getInt("id")));
+                while (rs.next()) {
+                    Date d = rs.getDate("deadline");
+                    LocalDate ld = (d == null ? null : d.toLocalDate());
+
+                    result.add(new TodoItem(
+                            rs.getInt("todo_id"),
+                            rs.getString("title"),
+                            rs.getString("description"),
+                            ld,
+                            rs.getBoolean("done"),
+                            null
+                    ));
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -135,30 +180,26 @@ public class TodoItemDAOJDBC implements TodoItemDAO {
     }
 
     @Override
-    public Collection<TodoItem> findByDeadlineBefore(java.time.LocalDate date) {
-        String sql = "SELECT id FROM todo_item WHERE deadline < ?";
+    public Collection<TodoItem> findByDeadlineAfter(LocalDate date) {
+        String sql = "SELECT todo_id, title, description, deadline, done FROM todo_item WHERE deadline > ?";
         Collection<TodoItem> result = new ArrayList<>();
-        try (Connection conn = DBUtils.getConnection();
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setDate(1, Date.valueOf(date));
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) result.add(findById(rs.getInt("id")));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return result;
-    }
+                while (rs.next()) {
+                    Date d = rs.getDate("deadline");
+                    LocalDate ld = (d == null ? null : d.toLocalDate());
 
-    @Override
-    public Collection<TodoItem> findByDeadlineAfter(java.time.LocalDate date) {
-        String sql = "SELECT id FROM todo_item WHERE deadline > ?";
-        Collection<TodoItem> result = new ArrayList<>();
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setDate(1, Date.valueOf(date));
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) result.add(findById(rs.getInt("id")));
+                    result.add(new TodoItem(
+                            rs.getInt("todo_id"),
+                            rs.getString("title"),
+                            rs.getString("description"),
+                            ld,
+                            rs.getBoolean("done"),
+                            null
+                    ));
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -168,8 +209,8 @@ public class TodoItemDAOJDBC implements TodoItemDAO {
 
     @Override
     public void remove(int id) {
-        String sql = "DELETE FROM todo_item WHERE id = ?";
-        try (Connection conn = DBUtils.getConnection();
+        String sql = "DELETE FROM todo_item WHERE todo_id = ?";
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
@@ -178,3 +219,4 @@ public class TodoItemDAOJDBC implements TodoItemDAO {
         }
     }
 }
+
