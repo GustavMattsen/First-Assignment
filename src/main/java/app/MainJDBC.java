@@ -30,7 +30,7 @@ public class MainJDBC {
                 "Milk, bread, eggs",
                 LocalDate.of(2025, 9, 30),
                 false,
-                null // no assignee in beginner version
+                null // no assignee
         );
         todoItemDAO.persist(item1);
         System.out.println("Saved todo: " + item1);
